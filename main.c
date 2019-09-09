@@ -58,8 +58,15 @@ struct user
     char college[30];
 };
 
+struct uans
+{
+    int qid,uid;
+    char ans[500];
+};
+
 struct que a;
 struct user u;
+struct uans nas;
 
 int main()
 {
@@ -162,6 +169,7 @@ void addquest(void)    //funtion that add question
 
     system("cls");
     printf("write the question \n");
+    //fgets(a.s,sizeof(a.s),stdin);
     scanf("%s",a.s);
 
     fp=fopen("questions.dat","ab+");
@@ -169,17 +177,15 @@ void addquest(void)    //funtion that add question
     fwrite(&a,sizeof(a),1,fp);
     fclose(fp);
 
-    int x;
-    printf("\n\n\npress 1 for main menu : ");
-    scanf("%d",&x);
-    if(x)
-        mainmenu();
+
+    getch();
+    mainmenu();
 
 }
 void viewuser()
 {
 
-    int i=0;
+int i=0;
 system("cls");
 int j=4;
 printf("*******************************USERS LIST*******************************\n");
@@ -198,50 +204,120 @@ printf("%s",u.name);
 gotoxy(25,j);
 printf("%s",u.college);
 gotoxy(36,j);
-printf("%s",u.score);
+printf("%d",u.score);
 
 j++;
 }
-    int x;
-    printf("\n\n\npress 1 for main menu : ");
-    scanf("%d",&x);
-    if(x)
-        mainmenu();
+    getch();
+    mainmenu();
 }
 void searchans()
 {
+int i=0;
+system("cls");
+int r;
+printf("\n\n    Enter Question ID : ");
+scanf("%d",&r);
 
+system("cls");
+
+fs=fopen("question.dat","rb+");
+rewind(fs); //open file for reading propose
+while(fread(&a,sizeof(a),1,fs)==1)
+{
+    if(a.id==r)
+        printf("\n\t\t\tTITLE : %s\n\n",a.title);
+}
+fclose(fs);
+
+printf("******************************* ANSWERS *******************************\n");
+printf("");
+printf("USER NAME    ANSWER");
+
+fs=fopen("question.dat","rb+");
+rewind(fs); //open file for reading propose
+while(fread(&a,sizeof(a),1,fs)==1)
+{
+    if(a.id==r)
+        printf("\n\t\t\tTITLE : %s\n\n",a.title);
+}
+
+    getch();
+    mainmenu();
 }
 void giveans(void)  //function that issue books from library
 {
+    system("cls");
+
+    printf("\n\nWrite question ID : ");
+    scanf("%d",&nas.qid);
+    fp = fopen("questions.dat","rb+");
+    int z=0;
+    while(fread(&a,sizeof(a),1,fp)==1)
+    {
+        if(nas.qid==a.id)
+            z++;
+    }
+    fclose(fp);
+    if(z==0)
+    {
+        printf("\n\nQuestion ID does not exits");
+        getch();
+        mainmenu();
+    }
+
+    printf("\n\nWrite Your ID : ");
+    scanf("%d",&nas.uid);
+    fp = fopen("users.dat","rb+");
+    int y=0;
+    while(fread(&u,sizeof(u),1,fp)==1)
+    {
+        if(nas.uid==u.uid)
+        {
+            y++;
+            u.score++;
+            fseek(fp,ftell(fp)-sizeof(u),0);
+            fwrite(&u,sizeof(u),1,fp);
+            break;
+        }
+
+    }
+    fclose(fp);
+    if(y==0)
+    {
+        printf("\n\nUser does not exits");
+        getch();
+        mainmenu();
+    }
+
+
+    printf("\n\nWrite your answer : \n");
+    scanf("%s",nas.ans);
+
+    ft = fopen("answer.dat","ab+");
+    fseek(ft,0,SEEK_END);
+    fwrite(&nas,sizeof(nas),1,ft);
+    fclose(ft);
+    getch();
+    mainmenu();
 
 }
 void adduser(void)
 {
     system("cls");
-    printf("give the user id : ");
-    scanf("%d",&u.uid);
 
-    system("cls");
-    printf("Enter your name : ");
-    scanf("%s",u.name);
-
-    system("cls");
-    printf("Enter your college \n");
-    scanf("%s",u.college);
-
-    u.score=0;
-
+    int x=getdata();
+    if(x){
     fs=fopen("users.dat","ab+");
+
     fseek(fs,0,SEEK_END);
     fwrite(&u,sizeof(u),1,fs);
     fclose(fs);
 
-    int x;
-    printf("\n\n\npress 1 for main menu : ");
-    scanf("%d",&x);
-    if(x)
-        mainmenu();
+    printf("\n\n\nUser added successful !!!");
+    getch();
+    mainmenu();
+    }
 
 }
 
@@ -251,12 +327,14 @@ void viewquest()
 int i=0;
 system("cls");
 int j=4;
+int k;
 printf("*******************************Questions list*******************************\n");
+
 gotoxy(2,2);
-printf("Qusetion ID   Qusetion Title    Question ");
+printf("Qusetion ID   Qusetion Title ");
 
 fs=fopen("questions.dat","rb+");
-rewind(fs); //open file for reading propose
+rewind(fs);
 while(fread(&a,sizeof(a),1,fs)==1)
 {
 
@@ -264,21 +342,47 @@ gotoxy(2,j);
 printf("%d",a.id);
 gotoxy(18,j);
 printf("%s",a.title);
-gotoxy(30,j);
-printf("%s",a.s);
-gotoxy(36,j);
-
 j++;
 
 }
 
-    int x;
-    printf("\n\n\npress 1 for main menu : ");
-    scanf("%d",&x);
-    if(x)
-        mainmenu();
+gotoxy(45,3);
+printf("Enter Question ID : ");
+int q=0;
+if(q)
+mainmenu();
+scanf("%d",&k);
+q++;
+que(k);
+getch();
+
+scanf("%d",&q);
+
 }
 
+void que(int k)
+{
+    system("cls");
+    fs = fopen("questions.dat","rb+");
+    rewind(fs);
+    if(k)
+    {
+        while(fread(&a,sizeof(a),1,fs)==1)
+        {
+            if(a.id==k)
+             {
+                 printf("\n\n\n");
+                puts(a.s);
+             }
+        }
+    }
+    else
+        printf("\n\n\n oops wrong id");
+
+    getch();
+    viewquest();
+
+}
 void Password(void) //for password option
 {
 
@@ -336,4 +440,58 @@ printf("\aWarning!! Incorrect Password");
 getch();
 Password();
 }
+}
+
+int getdata()
+{
+int t;
+gotoxy(20,3);printf("Enter the Information Below");
+gotoxy(20,4);printf("\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2");
+gotoxy(20,5);
+printf("\xB2");gotoxy(46,5);printf("\xB2");
+gotoxy(20,6);
+printf("\xB2");gotoxy(46,6);printf("\xB2");
+gotoxy(20,7);
+printf("\xB2");gotoxy(46,7);printf("\xB2");
+gotoxy(20,8);
+printf("\xB2");gotoxy(46,8);printf("\xB2");
+gotoxy(20,9);
+printf("\xB2");gotoxy(46,9);printf("\xB2");
+gotoxy(20,10);
+printf("\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2");
+gotoxy(21,5);
+printf("USER ID:\t");
+gotoxy(30,5);
+scanf("%d",&t);
+int y = checkid(t);
+if(y)
+{
+gotoxy(21,13);
+printf("\aThe user with this id already exists\a");
+getch();
+adduser();
+
+return 0;
+}
+else{
+u.uid=t;
+gotoxy(21,7);
+printf("USER Name:");gotoxy(33,7);
+scanf("%s",u.name);
+gotoxy(21,8);
+printf("COLLEGE:");gotoxy(30,8);
+scanf("%s",u.college);
+u.score=0;
+return 1;
+}
+}
+int checkid(int t)
+{
+fs = fopen("users.dat","ab+");
+rewind(fs);
+while(fread(&u,sizeof(u),1,fs)==1)
+{if(u.uid==t)
+return 1;
+}
+return 0;
 }
